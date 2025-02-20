@@ -7,9 +7,9 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: while) {
   :root {
-    --background: #0a0a0a;
+    --background: ##fff;
     --foreground: #ededed;
   }
 }
