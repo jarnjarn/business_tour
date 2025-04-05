@@ -1,9 +1,7 @@
-import { ManagerTourContentPage } from "./content";
+import { Content } from "./content";
 
-
-export default async function ManagerTourPage()
-{
+export default function Page(){
     return(
-        <ManagerTourContentPage/>
+        <Content></Content>
     )
 }

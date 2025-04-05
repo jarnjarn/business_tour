@@ -1,24 +1,10 @@
-export enum UserRole{
-    USER,
-    STAFF,
-    ADMIN=99
-}
-export enum UserStatus{
-    DEACTIVE,
-    ACTIVE
-
+export enum UserRole {
+    USER = "USER",
+    STAFF = "STAFF",
+    ADMIN = "ADMIN"
 }
 
-export enum TagUser{
-    ADMIN,
-    AGENCY_VIP,
-    AGENCY_SUPPERLIRER,
-    AGENCY,
-}
-
-export enum Rank{
-    DEFAULT,
-    SILVER,
-    GOLD,
-    DIAMOND
+export enum UserStatus {
+    ACTIVE = "ACTIVE",
+    LOCK = "LOCK"
 }

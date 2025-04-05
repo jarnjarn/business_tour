@@ -3,10 +3,10 @@
 import { Menu, Drawer, Button } from "antd";
 import { usePathname, useRouter } from "next/navigation"; // Dùng next/navigation
 import { useState } from "react";
+import { FaComment } from "react-icons/fa";
 import {
     UserOutlined,
     EnvironmentOutlined,
-    FormOutlined,
     CalendarOutlined,
     MenuOutlined,
     LeftOutlined,
@@ -16,8 +16,9 @@ import { ManagerLayout } from "@/components/layouts/manager.layoout";
 
 const menuItems = [
     { key: "/manager", icon: <UserOutlined />, label: "Quản lý nhân sự" },
-    { key: "/manager/tourist", icon: <EnvironmentOutlined />, label: "Quản lý khu tham quan" },
-    { key: "/manager/schedule", icon: <CalendarOutlined />, label: "Quản lý lịch trình" },
+    { key: "/manager/location", icon: <EnvironmentOutlined />, label: "Quản lý khu tham quan" },
+    { key: "/manager/tourist", icon: <CalendarOutlined />, label: "Quản lý lịch trình" },
+    { key: "/manager/evaluate", icon: <FaComment />, label: "Quản lý đánh giá" },
 ];
 
 export default function ManagerDefaultLayout({ children }: { children: React.ReactNode }) {

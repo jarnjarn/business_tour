@@ -1,28 +1,24 @@
 'use client'
-import { CreateScheduleModal } from "@/components/models/schedules/create.schedule";
+import { CreateTouristModal } from "@/components/modal/tourist/create.tourist";
+import { useEvaluateStore } from "@/states/evaluate.state";
+import { useLocationStore } from "@/states/location.store";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { FaStar } from "react-icons/fa"; // Biểu tượng sao
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import Link from "next/link";
-import { useState } from "react";
-
-const articles = [
-    {
-        id: 1,
-        title: "Khu vực đào tạo và thực hành phân tích của ngành thực phẩm tại LHU",
-        image: "/01.jpg",
-    },
-    {
-        id: 2,
-        title: "Khu vực đào tạo và thực hành Ngành xây dựng tại LHU",
-        image: "/02.jpg",
-    },
-];
 
 export default function UserContentPage() {
-    const [hoveredId, setHoveredId] = useState<number | null>(null);
+    const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const [locationId, setlocationId] = useState<string>("");
     const [config, setConfig] = useState<Record<string, boolean>>({
         create: false,
         update: false
     });
+    const { locations, fetchLocations, deleteLocation, isLoading } = useLocationStore();
+    const { evaluates, fetchEvaluates } = useEvaluateStore();
 
     const toggle = (key: string) => {
         return async () => {
@@ -33,21 +29,79 @@ export default function UserContentPage() {
         }
     }
 
+    const [query, setQuery] = useState<Record<string, any>>({
+        page: 1,
+        limit: 8,
+        query: "",
+    });
+
+    useEffect(() => {
+        loadLocations(query.page, query.limit);
+        fetchEvaluates({ page: 1, limit: 10000 })
+    }, [query]); // Theo dõi query và search
+
+    const loadLocations = async (page: number, limit: number) => {
+        await fetchLocations({ page, limit });
+    };
+
+    const getAverageRating = (locationId: string) => {
+        if (!evaluates?.data) return 0; // Trả về 0 nếu không có đánh giá
+        const reviews = evaluates.data.filter((review) => review.location._id === locationId);
+        if (reviews.length === 0) return 0;
+        const totalStars = reviews.reduce((sum, review) => sum + review.star, 0);
+        return (totalStars / reviews.length).toFixed(1);
+    };
+
+    // Intersection Observer để phát hiện khi phần tử vào màn hình
+    const [isInViewport, setIsInViewport] = useState(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setIsInViewport(true);
+                } else {
+                    setIsInViewport(false);
+                }
+            });
+        }, {
+            threshold: 0.3
+        });
+
+        const element = document.getElementById("targetElement");
+        if (element) {
+            observer.observe(element);
+        }
+
+        return () => {
+            if (element) {
+                observer.unobserve(element);
+            }
+        };
+    }, []);
+
+
+
     return (
         <div>
             {/* Banner */}
-            <CreateScheduleModal open={config.create} onCancel={toggle("create")} />
-            <div className="w-full h-auto">
-                <Image
-                    src="/banner.jpg"
-                    alt="Banner"
-                    width={1200}
-                    height={444}
-                    className="w-full h-auto"
-                />
+            <CreateTouristModal locationId={locationId} open={config.create} onCancel={toggle("create")} />
+            <div className="w-full mx-auto my-4 mb-3">
+                <Slider dots infinite speed={500} slidesToShow={1} slidesToScroll={1} autoplay autoplaySpeed={3000} adaptiveHeight>
+                    <div className="relative w-full h-48  md:h-[420px] mb-3">
+                        <Image src="/AI_LHU.jpg" alt="AI_LHU.jpg" layout="fill" objectFit="cover" />
+                    </div>
+                    <div className="relative w-full h-48  md:h-[420px] mb-3">
+                        <Image src="/AUN_QA.jpg" alt="AUN_QA.jpg" layout="fill" objectFit="cover" />
+                    </div>
+                    <div className="relative w-full h-48  md:h-[420px] mb-3">
+                        <Image src="/banner.jpg" alt="banner.jpg" layout="fill" objectFit="cover" />
+                    </div><div className="relative w-full h-48  md:h-[420px] mb-3">
+                        <Image src="/360Banner.jpg" alt="banner.jpg" layout="fill" objectFit="cover" />
+                    </div>
+                </Slider>
             </div>
 
-            <br />
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-center font-semibold text-lime-700 text-3xl">TẦM NHÌN - SỨ MỆNH</h1>
                 <br />
@@ -58,7 +112,7 @@ export default function UserContentPage() {
                     </div>
 
                     {/* Nội dung */}
-                    <div className="flex flex-col justify-center">
+                    <div id="targetElement" className={`flex flex-col justify-center transition-all duration-1000 transform ${isInViewport ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'}`}>
                         <div className="space-y-6">
                             <div>
                                 <h2 className="text-xl font-bold">✅ TẦM NHÌN</h2>
@@ -88,36 +142,30 @@ export default function UserContentPage() {
 
             {/* Articles Section */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                {articles.map((article, index) => (
-                    <div key={index}
-                        className="relative overflow-hidden rounded-xl shadow-lg group cursor-pointer"
-                        onMouseEnter={() => setHoveredId(article.id)}
-                        onMouseLeave={() => setHoveredId(null)}
-                    >
-                        <Image src={article.image} alt={article.title} width={300} height={200} className="w-full h-auto" />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-                            <h3 className="text-sm font-semibold">{article.title}</h3>
+                {locations?.data.map((location, index) => {
+                    const averageRating = getAverageRating(location._id);
+                    return (
+                        <div
+                            key={index}
+                            className="relative overflow-hidden rounded-xl shadow-lg cursor-pointer"
+                            onMouseEnter={() => setHoveredId(location._id)}
+                            onMouseLeave={() => setHoveredId(null)}
+                        >
+                            <Link href={"/location/" + location._id} >
+                                <Image src={location.image} alt={location.name} width={300} height={200} className="w-full h-[260px]" />
+                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
+                                    <h3 className="text-sm font-semibold">{location.name}</h3>
+                                    <div className="flex items-center text-yellow-400 text-sm mt-1">
+                                        {[...Array(5)].map((_, i) => (
+                                            <FaStar key={i} className={i < Math.round(Number(averageRating)) ? "text-yellow-500" : "text-gray-400"} />
+                                        ))}
+                                        <span className="ml-2">({averageRating})</span>
+                                    </div>
+                                </div>
+                            </Link>
                         </div>
-
-                        {/* Hover Buttons */}
-                        {hoveredId === article.id && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 transition-opacity duration-300">
-                                <Link href={`/tourist/${article.id}`}>
-                                    <button className="bg-white text-black px-4 py-2 md:px-6 md:py-3 rounded-lg m-1 text-sm md:text-base">
-                                        Xem chi tiết
-                                    </button>
-                                </Link>
-                                <button
-                                    onClick={toggle("create")}
-                                    className="bg-blue-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg m-1 text-sm md:text-base"
-                                >
-                                    Đăng ký tham quan
-                                </button>
-                            </div>
-                        )}
-
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

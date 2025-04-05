@@ -1,38 +1,52 @@
-import type {UserController} from "@/controllers/user.controller";
-import type {User} from "@/entities/user.entity";
-import type {UserLoginDto, UserRegisterDto, UserUpdateDto, UserUpdateRoleDto} from "@/dto/users/userRegisterDto";
-import {RestBase} from "@/common/base/rest.base";
-import axiosClient from "@/clients/axios";
-import type {ResultType} from "@/@types/common.type";
+import { UserLoginDto, UserRegisterDto } from "@/dto/user.dto";
+import axiosClient from "./axios";
+import { PaginationDto } from "@/dto/pagination.dto";
+import { UserRole } from "@/@types/users/user.enum";
 
-export class UserClient extends RestBase<User>(axiosClient,"/users")
-{
-    login(data:UserLoginDto):ResultType<UserController['login']>
-    {
-        return this.axios.post("/api/users/login",data);
+export interface UserUpdateDto {
+    updates: { email?: string; phone?: string; role?: UserRole }
+}
+export interface UpdatePassWordDto {
+    oldPassword: string,
+    newPassword: string
+}
+
+export class UserClient {
+    login(data: UserLoginDto) {
+        return axiosClient.post("/user/login", data);
     }
 
-    register(data:UserRegisterDto):ResultType<UserController['register']> {
-        return this.axios.post("/api/users/register", data);
+    register(data: UserRegisterDto) {
+        return axiosClient.post("/user/register", data);
     }
 
-    getMe():ResultType<UserController['me']> {
-        return this.axios.get("/api/users/me");
+    getAllUsers = async (pagination: PaginationDto) => {
+        return axiosClient.get(`/user`, {
+            params: {
+                page: pagination.page,
+                limit: pagination.limit,
+                search: pagination.search || "", // Truyền giá trị tìm kiếm nếu có
+            },
+        });
+    };
+
+    getUserById(id: string) {
+        return axiosClient.get(`/user/${id}`);
     }
 
-    updateMe(data:Partial<UserUpdateDto>):ResultType<UserController['updateMe']> {
-        return this.axios.put("/api/users/me", data);
+    deleteUser(id: string) {
+        return axiosClient.delete(`/user/${id}`);
     }
 
-    updateRole(id:number,data:UserUpdateRoleDto):ResultType<UserController['updateRole']> {
-        return this.axios.put(`/api/users/${id}/role`, data);
+    getMe() {
+        return axiosClient.get("/user/me");
     }
 
-    updateStatus(id:number,data:UserUpdateRoleDto):ResultType<UserController['updateStatus']> {
-        return this.axios.put(`/api/users/${id}/status`, data);
+    updateUser(id: string, data: UserUpdateDto) {
+        return axiosClient.put(`/user/${id}`, data);
+    }
+    changePassword(id: string, data: UpdatePassWordDto){
+        return axiosClient.put(`/user/${id}/change-password`, data);
     }
 
-    updateAvatar(data:FormData):Promise<User> {
-        return this.axios.putForm(`/api/users/me/avatar`, data);
-    }
 }
