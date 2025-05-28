@@ -8,6 +8,7 @@ const scheduleClient = new ScheduleClient();
 export interface Schedule {
     _id: string;
     tourist: string;
+    room: string;
     time: string;
     title: string;
     content: string;

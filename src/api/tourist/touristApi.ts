@@ -4,7 +4,8 @@ import {
     getAllTouristRequests, 
     getTouristById, 
     updateTouristStatus, 
-    deleteTouristRequest 
+    deleteTouristRequest, 
+    compareTouristStatsByLocation
 } from "@/service/tourist.service";
 import { checkAdminOrStaff, verifyToken } from "@/common/middleware/verifyToken";
 
@@ -25,6 +26,10 @@ tourist.post("/", verifyToken, async (c) => {
     } catch (error: any) {
         return c.json({ error: error.message }, 400);
     }
+});
+tourist.get("/compare", verifyToken,checkAdminOrStaff, async (c) => {
+    const result = await compareTouristStatsByLocation();
+    return c.json(result);
 });
 
 // 🟡 Lấy danh sách yêu cầu du lịch (phân trang, tìm kiếm)
@@ -74,5 +79,7 @@ tourist.delete("/:id", verifyToken,checkAdminOrStaff, async (c) => {
         return c.json({ error: error.message }, 400);
     }
 });
+
+
 
 export default tourist;

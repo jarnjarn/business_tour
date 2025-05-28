@@ -85,7 +85,7 @@ export function ManagerContentPage() {
                             onChange: (page, pageSize) => setQuery({ ...query, page, limit: pageSize }),
                         }}
                     >
-                        <Table.Column width={50} align={"center"} title="STT" render={(_, __, index) => index + 1} />
+                        <Table.Column width={50} align={"center"} title="STT" render={(_, key, index) => index + 1} />
                         <Table.Column width={150} title="Tài khoản" dataIndex="username" key="username" />
                         <Table.Column width={150} title="Tên đầy đủ" dataIndex="email" key="email" />
                         <Table.Column width={150} title="Tên đầy đủ" dataIndex="phone" key="phone" />

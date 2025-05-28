@@ -1,6 +1,7 @@
 'use client'
 import { useScheduleStore } from "@/states/schedule.state";
 import { useTouristStore } from "@/states/tourist.state";
+import dayjs from "dayjs";
 import Image from "next/image";
 import { useEffect } from "react";
 
@@ -16,7 +17,6 @@ export function Content({ id }: ScheduleProps) {
         getByIdTourist(id);
         getById(id);
     }, [id]);
-
     return (
         <div className="p-3 md:p-6 bg-gray-100 rounded-lg shadow-md mt-6">
             <h1 className="text-xl md:text-2xl mt-6 font-semibold text-lime-700 text-center">
@@ -55,10 +55,11 @@ export function Content({ id }: ScheduleProps) {
                                 {/* Nội dung */}
                                 <div className={`p-4 rounded-lg shadow-md w-56 bg-purple-100 ${index % 2 === 0 ? "ml-auto mr-6" : "mr-auto ml-6"
                                     }`}>
-                                    <p className="text-lg font-bold text-gray-700">{item.time}</p>
+                                    <p className="text-lg font-bold text-gray-700">{dayjs(item.time).format("DD/MM/YYYY:HH")}</p>
                                     <p className="text-lg font-semibold">{item.title}</p>
-                                    <p className="text-sm">{item.content}</p>
-                                    <p className="text-xs text-gray-500">{item.organizer}</p>
+                                    <p className="text-sm">Nội dung: {item.content}</p>
+                                    <p className="text-xs text-gray-500">Người hưỡng dẫn: {item.organizer?.username || "Không xác định"}</p>
+                                    <p className="text-xs text-gray-500">Phòng: {item.room?.name || "Không xác định"}</p>
                                 </div>
                             </div>
                         ))}

@@ -1,20 +1,22 @@
 'use client'
-import { Button, Input, Modal, ModalProps, Popconfirm, Space, Table } from "antd";
+import { Button, Input, Modal, ModalProps, Popconfirm, Select, Space, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { UpdateTouristModal } from "../tourist/update.tourist";
-import { CreateScheduleModal } from "./create.schedule";
 import { useTouristStore } from "@/states/tourist.state";
 import { useScheduleStore } from "@/states/schedule.state";
 import dayjs from "dayjs";
-import { UpdateScheduleModal } from "./update.schedule";
-
-export default function ListSchedule(props: ModalProps) {
+import { Room, useRoomStore } from "@/states/room.state";
+import { useLocationStore } from "@/states/location.store";
+import { CreateRoomModal } from "./create.room";
+import { UpdateRoomModal } from "./update.room";
+import { RoomStatus } from "@/@types/room/room.enum";
+export default function ListRoom(props: ModalProps) {
     const [config, setConfig] = useState<Record<string, boolean>>({
         create: false,
         update: false
     });
-    const { select } = useTouristStore()
-    const { list, getByIdTourist, deleteSchedule,setSelect } = useScheduleStore()
+    const { select } = useLocationStore()
+    const { list, getByLocationId, deleteRoom,setSelect,updateRoom } = useRoomStore()
 
     const toggle = (key: string) => {
         return async () => {
@@ -26,34 +28,37 @@ export default function ListSchedule(props: ModalProps) {
     }
 
     const handleDelete = async (id: string) => {
-        await deleteSchedule(id);
+        await deleteRoom(id);
     };
 
-
+    const handleChangeStatus = async (id: string, status: string) => {
+        await updateRoom(id, { status: status as RoomStatus });
+    }
     useEffect(() => {
-        console.log(select?._id)
-        getByIdTourist(select?._id as any);
+        if (select && select._id) {
+            getByLocationId(select?._id as any);
+        }
     }, [select]);
 
     return (
         <div className={"max-w-[1000px]"}>
             <Modal
                 {...props}
-                title="Danh sách lịch trình"
+                title="Danh sách phòng"
                 cancelText="Đóng"
                 width={1240}
             >
                 <div>
-                    <CreateScheduleModal TouristId={select?._id as any} open={config.create} onCancel={toggle("create")} />
-                    <UpdateScheduleModal open={config.update} onCancel={toggle("update")} />
+                    <CreateRoomModal LocationId={select?._id as any} open={config.create} onCancel={toggle("create")} />
+                    <UpdateRoomModal open={config.update} onCancel={toggle("update")} />
                     <div className="flex justify-between mb-4 flex-col md:flex-row gap-4">
                         <div className="lg:max-w-[350px] md:min-w-[350px] min-w-[100%] flex gap-2">
                             <Button onClick={toggle("create")} type="primary">
-                                Thêm lịch chình mới
+                                Thêm phòng mới
                             </Button>
                             <Button onClick={() => {
                                 if (select && select._id) {
-                                    getByIdTourist(select?._id as any);
+                                    getByLocationId(select?._id as any);
                                 }
                             }} type="primary">
                                 Tải lại
@@ -79,17 +84,24 @@ export default function ListSchedule(props: ModalProps) {
                     })}
                 >
                     <Table.Column width={50} align={"center"} title="STT" render={(_, __, index) => index + 1} />
-                    <Table.Column width={150} title="Tiêu đề" dataIndex="title" key="title" />
-                    <Table.Column width={150} title="Nội dung" dataIndex="content" key="content" />
+                    <Table.Column width={150} title="Tên phòng" dataIndex="name" key="name" />
+                    <Table.Column width={150} title="Mô tả" dataIndex="description" key="description" />
+                    <Table.Column width={150} title="Số lượng tối đa" dataIndex="capacity" key="capacity" />
                     <Table.Column
                         width={150}
-                        title="Ngày bắt đầu"
-                        dataIndex="time"
-                        key="time"
-                        render={(date) => dayjs(date).format("DD/MM/YYYY:HH")}
+                        title="Trạng thái"
+                        dataIndex="status"
+                        key="status"
+                        render={(status, record: Room) => (
+                            <Select
+                                defaultValue={status}
+                                style={{ width: 120 }}
+                                onChange={(value) => handleChangeStatus(record._id, value)}>
+                                <Select.Option value={RoomStatus.EMPTY}>Phòng Trống</Select.Option>
+                                <Select.Option value={RoomStatus.BUSY}>Phòng Bận</Select.Option>
+                            </Select>
+                        )}
                     />
-                    <Table.Column width={150} title="Người hưỡng dẫn" dataIndex="organizer" key="organizer" render={(_, entity: any) => entity.organizer?.username} />
-                    <Table.Column width={150} title="Phòng" dataIndex="room" key="room" render={(_, entity: any) => entity.room?.name} />
 
                     <Table.Column width={150} align={"center"} title="Chức năng" render={(_, entity: any) => (
                         <Space>

@@ -53,20 +53,39 @@ axiosClient.interceptors.request.use(async (config) => {
 }, (error) => {
     return Promise.reject(error);
 })
-axiosClient.interceptors.response.use((response) => {
-    return response.data;
-}, (error) => {
-    if (typeof window !== 'undefined') {
-        if (error?.response?.data?.code && error?.response?.data?.message && error?.response?.data?.status) {
-            message.error(error.response.data?.message)
+axiosClient.interceptors.response.use(
+    (response) => {
+      return response.data;
+    },
+    (error) => {
+      if (typeof window !== 'undefined') {
+        const status = error?.response?.status;
+  
+        // Nếu token hết hạn hoặc không hợp lệ
+        if (status === 401 || status === 403) {
+          // Xoá token
+          CookieUtil.removeCookie("token");
+  
+          // Chuyển hướng về login
+          window.location.href = "/login";
+          return; // dừng xử lý tiếp
         }
-
+        // Thông báo lỗi nếu có message
+        if (
+          error?.response?.data?.code &&
+          error?.response?.data?.message &&
+          error?.response?.data?.status
+        ) {
+          message.error(error.response.data?.message);
+        }
+  
         return Promise.reject(error.response.data);
-    }
-    else {
+      } else {
         return Promise.reject(error);
+      }
     }
-})
+  );
+  
 
 
 

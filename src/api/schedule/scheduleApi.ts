@@ -14,13 +14,13 @@ const schedule = new Hono();
 // 🟢 Thêm lịch trình mới
 schedule.post("/", verifyToken,checkAdminOrStaff, async (c) => {
     try {
-        const { touristId, time, title, content, organizer } = await c.req.json();
+        const { touristId, roomId, time, title, content, organizer } = await c.req.json();
 
-        if (!touristId || !time || !title || !content || !organizer) {
+        if (!touristId || !roomId || !time || !title || !content || !organizer) {
             return c.json({ error: "Thiếu thông tin bắt buộc" }, 400);
         }
 
-        const newSchedule = await createSchedule(touristId, time, title, content, organizer);
+        const newSchedule = await createSchedule(touristId, roomId, time, title, content, organizer);
         return c.json(newSchedule);
     } catch (error: any) {
         return c.json({ error: error.message }, 400);

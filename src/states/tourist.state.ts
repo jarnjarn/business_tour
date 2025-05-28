@@ -4,6 +4,7 @@ import { PaginationDto } from "@/dto/pagination.dto";
 import { Pagination } from "@/common/struct/pagination.struct";
 import { notiClient } from "@/clients/noti.client";
 import { User } from "@/@types/users/user.type";
+import { Statistic } from "@/@types/tourist/statistic";
 
 const touristClient = new TouristClient();
 
@@ -32,6 +33,7 @@ export interface TouristState {
     search: string;
     totalTourists: number;
     currentPage: number;
+    statistics: Statistic[] | null;
     setSearch: (search: string) => void;
     setSelect: (tourist: Tourist) => void;
     fetchTourists: (pagination: PaginationDto) => Promise<void>;
@@ -39,6 +41,7 @@ export interface TouristState {
     updateTourist: (id: string, data: Partial<Tourist>) => Promise<void>;
     deleteTourist: (id: string) => Promise<void>;
     getById: (id: string) => Promise<void>;
+    compareTouristStatsByLocation: () => Promise<void>;
 }
 
 export const useTouristStore = create<TouristState>((set, get) => ({
@@ -49,6 +52,7 @@ export const useTouristStore = create<TouristState>((set, get) => ({
     tourist: null,
     totalTourists: 0,
     currentPage: 0,
+    statistics: null,
 
     setSearch: (search: string) => {
         set({ search });
@@ -121,6 +125,17 @@ export const useTouristStore = create<TouristState>((set, get) => ({
             });
         } catch (error) {
             console.error("Failed to fetch tourist details:", error);
+            set({ isLoading: false });
+        }
+    },
+
+    compareTouristStatsByLocation: async () => {
+        set({ isLoading: true });
+        try {
+            const result: any = await touristClient.compareTouristStatsByLocation();
+            set({ isLoading: false, statistics: result });
+        } catch (error) {
+            console.error("Failed to compare tourist stats by location:", error);
             set({ isLoading: false });
         }
     }

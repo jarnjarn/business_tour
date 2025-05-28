@@ -2,6 +2,7 @@ import { Tourist } from "@/models/tourist.model";
 import { Types } from "mongoose";
 import { PaginationDto } from "@/dto/pagination.dto";
 import { Pagination } from "@/common/struct/pagination.struct";
+import { Location } from "@/models/location.model";
 
 export const createTouristRequest = async (
     userId: string,
@@ -98,4 +99,61 @@ export const getTouristIdUser = async (userId: string) => {
         .exec();
 
     return schedules; // Trả về danh sách schedule (mảng)
+};
+
+export const compareTouristStatsByLocation = async () => {
+  const result = await Location.aggregate([
+    {
+      $lookup: {
+        from: "tourists",
+        localField: "_id",
+        foreignField: "location",
+        as: "tourists",
+      },
+    },
+    {
+      $project: {
+        locationId: "$_id",
+        locationName: "$name",
+        totalTourists: { $size: "$tourists" },
+        totalPeople: {
+          $reduce: {
+            input: "$tourists",
+            initialValue: 0,
+            in: { $add: ["$$value", "$$this.totalPeople"] },
+          },
+        },
+        approvedCount: {
+          $size: {
+            $filter: {
+              input: "$tourists",
+              as: "t",
+              cond: { $eq: ["$$t.status", "approved"] },
+            },
+          },
+        },
+        pendingCount: {
+          $size: {
+            $filter: {
+              input: "$tourists",
+              as: "t",
+              cond: { $eq: ["$$t.status", "pending"] },
+            },
+          },
+        },
+        rejectedCount: {
+          $size: {
+            $filter: {
+              input: "$tourists",
+              as: "t",
+              cond: { $eq: ["$$t.status", "rejected"] },
+            },
+          },
+        },
+      },
+    },
+    { $sort: { totalTourists: -1 } },
+  ]);
+
+  return result;
 };

@@ -11,6 +11,7 @@ import {
     MenuOutlined,
     LeftOutlined,
     RightOutlined,
+    BarChartOutlined,
 } from "@ant-design/icons";
 import { ManagerLayout } from "@/components/layouts/manager.layoout";
 
@@ -19,6 +20,7 @@ const menuItems = [
     { key: "/manager/location", icon: <EnvironmentOutlined />, label: "Quản lý khu tham quan" },
     { key: "/manager/tourist", icon: <CalendarOutlined />, label: "Quản lý lịch trình" },
     { key: "/manager/evaluate", icon: <FaComment />, label: "Quản lý đánh giá" },
+    { key: "/manager/statistics", icon: <BarChartOutlined />, label: "Thống kê" },
 ];
 
 export default function ManagerDefaultLayout({ children }: { children: React.ReactNode }) {

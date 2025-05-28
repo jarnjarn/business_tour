@@ -45,4 +45,9 @@ export class TouristClient {
     deleteTourist = async (id: string) => {
         return axiosClient.delete(`/tourist/${id}`);
     };
+
+    // 🔵 So sánh số lượng du khách theo địa điểm
+    compareTouristStatsByLocation = async () => {
+        return axiosClient.get("/tourist/compare");
+    };
 }

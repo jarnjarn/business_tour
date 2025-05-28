@@ -7,6 +7,7 @@ import tourist from "@/api/tourist/touristApi";
 import schedule from "@/api/schedule/scheduleApi";
 import noti from "@/api/noti/notiApi";
 import evaluate from "@/api/evaluate/evaluateApi";
+import room from "@/api/room/room.api";
 
 export const runtime = "nodejs";
 
@@ -20,6 +21,7 @@ app.route("/location", location);
 app.route("/tourist", tourist);
 app.route("/schedule", schedule);
 app.route("/noti", noti);
+app.route("/room", room);
 
 
 

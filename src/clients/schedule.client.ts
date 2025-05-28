@@ -3,6 +3,7 @@ import { PaginationDto } from "@/dto/pagination.dto";
 
 export interface CreateScheduleDto {
     tourist: string;  // ID của Tourist
+    room: string;  // Id phòng
     time: Date;      // Thời gian diễn ra sự kiện
     title: string;     // Tiêu đề
     content: string;   // Nội dung chi tiết
@@ -11,6 +12,7 @@ export interface CreateScheduleDto {
 
 export interface UpdateScheduleDto {
     time?: Date;
+    room?: string;
     title?: string;
     content?: string;
     organizer?: string;

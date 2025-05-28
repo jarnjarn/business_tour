@@ -3,18 +3,20 @@
 import { useEffect, useState } from "react";
 import { CreateLocationModal } from "@/components/modal/location/create.modal";
 import { UpdateLocationModal } from "@/components/modal/location/update.model";
-import { Input, Button, Popconfirm, Space, Table } from "antd";
+import { Input, Button, Popconfirm, Space, Table, Tooltip } from "antd";
 import Image from "next/image";
 import { useLocationStore } from "@/states/location.store";
 import { RequireRole } from "@/components/requireRole/RequireRole";
 import { UserRole } from "@/@types/users/user.enum";
-
+import { AiOutlineSchedule } from "react-icons/ai";
+import ListRoom from "@/components/modal/room/listRoom.location";
 export function ManagerTourContentPage() {
     const { locations, fetchLocations, deleteLocation, isLoading } = useLocationStore();
     const [search, setSearch] = useState("");
     const [config, setConfig] = useState<Record<string, boolean>>({
         create: false,
-        update: false
+        update: false,
+        list: false
     });
     const [query, setQuery] = useState<Record<string, any>>({
         page: 1,
@@ -46,6 +48,7 @@ export function ManagerTourContentPage() {
                 </h1>
                 <br />
                 <CreateLocationModal open={config.create} onCancel={toggle("create")} />
+                <ListRoom open={config.list} onCancel={toggle("list")} />
                 <UpdateLocationModal open={config.update} onCancel={toggle("update")} />
                 <div className="flex justify-between mb-4 flex-col md:flex-row gap-4">
                     <div className="lg:max-w-[350px] md:min-w-[350px] min-w-[100%] flex gap-2">
@@ -110,6 +113,15 @@ export function ManagerTourContentPage() {
                         title="Chức năng"
                         render={(_, entity) => (
                             <Space>
+                                <Tooltip title="Xem danh sách phòng">
+                                    <Button
+                                        onClick={() => {
+                                            useLocationStore.getState().setSelect(entity as any);
+                                            toggle("list")();
+                                        }}
+                                        type={"primary"}
+                                    ><AiOutlineSchedule /></Button>
+                                </Tooltip>
                                 <Button
                                     onClick={() => {
                                         useLocationStore.getState().setSelect(entity as any);

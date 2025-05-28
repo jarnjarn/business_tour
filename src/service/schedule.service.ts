@@ -2,29 +2,39 @@ import { Types } from "mongoose";
 import { PaginationDto } from "@/dto/pagination.dto";
 import { Pagination } from "@/common/struct/pagination.struct";
 import { Schedule } from "@/models/shedule.model";
+import { Room } from "@/models/room.model";
+import { RoomStatus } from "@/@types/room/room.enum";
 
 export const createSchedule = async (
     touristId: string,
+    roomId: string,
     time: Date,
     title: string,
     content: string,
     organizer: string
 ) => {
     console.log(touristId,time,title,content,organizer)
-    if (!Types.ObjectId.isValid(touristId)) {
-        throw new Error("Invalid tourist ID");
+    if (!Types.ObjectId.isValid(touristId) || !Types.ObjectId.isValid(roomId)) {
+        throw new Error("Invalid tourist ID or room ID");
     }
 
     const newSchedule = new Schedule({
         tourist: touristId,
+        room: roomId,
         time,
         title,
         content,
         organizer
     });
-    console.log(newSchedule)
 
     await newSchedule.save();
+    if(newSchedule){
+        const room = await Room.findById(roomId)
+        if(room){
+            room.status = RoomStatus.BUSY
+            await room.save()
+        }
+    }
     return newSchedule;
 };
 
@@ -62,13 +72,15 @@ export const getSchedulesByTouristId = async (touristId: string) => {
         throw new Error("Invalid tourist ID");
     }
 
-    // Tìm tất cả schedule có touristId tương ứng
     const schedules = await Schedule.find({ tourist: touristId })
-        .populate("tourist", "name") // Lấy thêm thông tin tên của Tourist nếu cần
+        .populate("organizer", "username")  // Lấy tên người tổ chức
+        .populate("tourist", "name")        // Lấy tên địa điểm (nếu cần)
+        .populate("room", "name")           // ✅ LẤY THÊM TÊN PHÒNG
         .exec();
 
-    return schedules; // Trả về danh sách schedule (mảng)
+    return schedules;
 };
+
 
 export const updateSchedule = async (
     scheduleId: string,
