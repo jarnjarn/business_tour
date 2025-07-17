@@ -1,11 +1,11 @@
 import { Hono } from "hono";
 import { checkAdminOrStaff, verifyToken } from "@/common/middleware/verifyToken";
-import { createRoom, deleteRoom, getAllRooms, getRoomById, getRoomsByLocationId, updateRoom } from "@/service/room.service";
+import { createRoom, deleteRoom, getAllRooms, getRoomById, getRoomsByLocationId, updateRoom, updateRoomImg } from "@/service/room.service";
 
 const room = new Hono();
 
 // 🟢 Thêm lịch trình mới
-room.post("/", verifyToken,checkAdminOrStaff, async (c) => {
+room.post("/", verifyToken, checkAdminOrStaff, async (c) => {
     try {
         const { name, description, capacity, location } = await c.req.json();
 
@@ -15,8 +15,8 @@ room.post("/", verifyToken,checkAdminOrStaff, async (c) => {
 
         const newRoom = await createRoom(name, description, capacity, location);
         return c.json(newRoom);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -38,8 +38,8 @@ room.get("/:id", async (c) => {
         const roomId = c.req.param("id");
         const room = await getRoomById(roomId);
         return c.json(room);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -52,32 +52,51 @@ room.get("/location/:locationId", async (c) => {
         }
         const rooms = await getRoomsByLocationId(locationId);
         return c.json(rooms);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
 // 🟠 Cập nhật lịch trình
-room.put("/:id", verifyToken,checkAdminOrStaff, async (c) => {
+room.put("/:id", verifyToken, checkAdminOrStaff, async (c) => {
     try {
         const roomId = c.req.param("id");
         const updates = await c.req.json();
 
         const updatedRoom = await updateRoom(roomId, updates);
         return c.json(updatedRoom);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
 // 🔴 Xóa lịch trình
-room.delete("/:id", verifyToken,checkAdminOrStaff, async (c) => {
+room.delete("/:id", verifyToken, checkAdminOrStaff, async (c) => {
     try {
         const roomId = c.req.param("id");
         const result = await deleteRoom(roomId);
         return c.json(result);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
+    }
+});
+
+// 🟠 Cập nhật ảnh QrCode
+room.put("/:id/image", verifyToken, checkAdminOrStaff, async (c) => {
+    try {
+        const roomId = c.req.param("id");
+        const formData = await c.req.formData(); // ✅ Lấy FormData đúng cách
+        const image = formData.get("image") as File;
+        if (!image) throw new Error("Không có ảnh được gửi lên");
+
+        const buffer = await image.arrayBuffer();
+        const base64Image = Buffer.from(buffer).toString("base64");
+        const cloudinaryUrl = `data:${image.type};base64,${base64Image}`;
+
+        const updatedRoom = await updateRoomImg(roomId, cloudinaryUrl);
+        return c.json(updatedRoom);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 

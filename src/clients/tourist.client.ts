@@ -1,3 +1,5 @@
+
+import { IUserRegister } from "@/models/tourist.model";
 import axiosClient from "./axios";
 import { PaginationDto } from "@/dto/pagination.dto";
 
@@ -49,5 +51,10 @@ export class TouristClient {
     // 🔵 So sánh số lượng du khách theo địa điểm
     compareTouristStatsByLocation = async () => {
         return axiosClient.get("/tourist/compare");
+    };
+
+    // 🟢 Đăng ký lịch trình
+    updateUserRegister = async (id: string, data: IUserRegister) => {
+        return axiosClient.post(`/tourist/register/${id}`, data);
     };
 }

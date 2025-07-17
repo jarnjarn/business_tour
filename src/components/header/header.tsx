@@ -9,12 +9,13 @@ import { UserRole, UserStatus } from "@/@types/users/user.enum";
 import { useAuthStore } from "@/states/auth.state";
 import { CookieUtil } from "@/common/utils/cookie.util";
 import { NotificationDropdown } from "../common/NotificationDropdown";
+import { Button } from "antd";
 
 export function HeaderComponent() {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isUserDropdownOpen, setUserDropdownOpen] = useState(false);
     const pathname = usePathname();
-    const { auth, logout, fetchMe,isLoading } = useAuthStore();
+    const { auth, logout, fetchMe, isLoading } = useAuthStore();
     const router = useRouter();
     const commonMenuItems = [
         { name: "Trang chủ", path: "/" },
@@ -52,12 +53,12 @@ export function HeaderComponent() {
 
                 {/* 🖥️ PC MENU */}
                 <nav className="hidden md:flex items-center space-x-8">
-                    {commonMenuItems.map((item) => {
+                    {commonMenuItems.map((item, index) => {
                         const isActive = pathname === item.path; // Kiểm tra xem có phải trang hiện tại không
 
                         return (
                             <Link
-                                key={item.path}
+                                key={index}
                                 href={item.path}
                                 className={`relative text-lg font-medium transition-all duration-300 ${isActive ? "text-blue-600 font-semibold" : "text-gray-800 hover:text-blue-600"
                                     }`}
@@ -118,9 +119,11 @@ export function HeaderComponent() {
                         </>
                     ) : (
                         <>
-                            <Link href="/login" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                                Đăng nhập
-                            </Link>
+                            {
+                                isLoading ? <Button type="primary" htmlType="submit" block>Đang đăng nhập...</Button> : <Link href="/login" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                                    Đăng nhập
+                                </Link>
+                            }
                         </>
                     )}
                 </div>

@@ -10,8 +10,9 @@ import {
   changePassword,
 } from "@/service/user.service";
 import { checkAdminOrStaff, verifyToken } from "@/common/middleware/verifyToken";
+import { EnvWithUser } from "@/@types/hono";
 
-const user = new Hono();
+const user = new Hono<EnvWithUser>();
 
 // Đăng ký user
 user.post("/register", async (c) => {

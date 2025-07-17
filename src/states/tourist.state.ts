@@ -5,24 +5,26 @@ import { Pagination } from "@/common/struct/pagination.struct";
 import { notiClient } from "@/clients/noti.client";
 import { User } from "@/@types/users/user.type";
 import { Statistic } from "@/@types/tourist/statistic";
+import { IUserRegister } from "@/models/tourist.model";
 
 const touristClient = new TouristClient();
 
 export interface Tourist {
     _id: string;
     location: Location;
-    user:User;
-    totalPeople:number;
+    user: User;
+    totalPeople: number;
     form: string; // Ngày bắt đầu
     to: string;   // Ngày kết thúc
     status: string; // pending | approved | rejected
     note?: string; // Ghi chú từ admin
+    userRegister: IUserRegister[];
 }
 
 export interface Location {
-    _id:string;
-    name:string;
-    image:string
+    _id: string;
+    name: string;
+    image: string
 }
 
 export interface TouristState {
@@ -42,6 +44,7 @@ export interface TouristState {
     deleteTourist: (id: string) => Promise<void>;
     getById: (id: string) => Promise<void>;
     compareTouristStatsByLocation: () => Promise<void>;
+    updateUserRegister: (id: string, data: IUserRegister) => Promise<void>;
 }
 
 export const useTouristStore = create<TouristState>((set, get) => ({
@@ -138,5 +141,24 @@ export const useTouristStore = create<TouristState>((set, get) => ({
             console.error("Failed to compare tourist stats by location:", error);
             set({ isLoading: false });
         }
+    },
+
+    updateUserRegister: async (id: string, data: IUserRegister) => {
+        set({ isLoading: true });
+        try {
+            await touristClient.updateUserRegister(id, data);
+
+            // Sau khi update xong thì gọi lại getById để lấy dữ liệu mới nhất
+            const result: any = await touristClient.getTouristById(id);
+            set({
+                tourist: result,
+                isLoading: false
+            });
+
+        } catch (error) {
+            console.error("Failed to update user register:", error);
+            set({ isLoading: false });
+        }
     }
+
 }));

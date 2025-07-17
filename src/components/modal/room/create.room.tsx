@@ -1,36 +1,29 @@
 'use client'
 
+import { useLocationStore } from "@/states/location.store";
 import { useRoomStore } from "@/states/room.state";
-import { DatePicker, InputNumber, message, Modal } from "antd";
+import { message, Modal, Select } from "antd";
 import type { ModalProps } from "antd"; // ✅ Đúng cách import kiểu dữ liệu
-import { Form, Input } from "antd";
-import dayjs from "dayjs";
+import { Form, Input, InputNumber } from "antd";
 import { useEffect } from "react";
+import { CreateRoomDto } from "@/clients/room.client";  
 
-interface CreateRoomModalProps extends ModalProps {
-    LocationId: string; // ID của địa điểm
-}
-
-export function CreateRoomModal({ LocationId, ...props }: CreateRoomModalProps) {
+export function CreateRoomModal(props: ModalProps) {
     const [form] = Form.useForm();
     const { createRoom } = useRoomStore();
     const [messageApi, contextHolder] = message.useMessage();
 
-    const onFinish = async (values: any) => {
-        console.log(LocationId)
+    const {fetchLocations,locations} = useLocationStore()
 
-        const data = {
-            location: LocationId,
-            ...values
-        }
+    const onFinish = async (values: CreateRoomDto) => {
 
         try {
-            await createRoom(data);
+            await createRoom(values);
             messageApi.success("Tạo thành công!");
             form.resetFields();
             if (props.onCancel) props.onCancel(undefined as any);
-        } catch (error) {
-            messageApi.error("lỗi không thể tạo");
+        } catch (error:any) {
+            messageApi.error(error.response.data.error);
         }
 
     };
@@ -38,6 +31,7 @@ export function CreateRoomModal({ LocationId, ...props }: CreateRoomModalProps) 
     useEffect(() => {
         if (props.open) {
             form.resetFields();
+            fetchLocations({page:1,limit:100,search:""});
         }
     }, [props.open]);
 
@@ -71,6 +65,18 @@ export function CreateRoomModal({ LocationId, ...props }: CreateRoomModalProps) 
                     >
                         <Input.TextArea />
                     </Form.Item>
+                    <Form.Item
+                        label="Địa điểm"
+                        name="location"
+                    >
+                        <Select
+                            options={locations?.data?.map((location) => ({
+                                label: location.name,
+                                value: location._id
+                            }))}
+                        />
+                    </Form.Item>
+
 
                     <Form.Item
                         label="Số lượng tối đa"

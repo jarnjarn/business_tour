@@ -1,8 +1,8 @@
 import {NextRequest} from "next/server";
 
-export type Constructor<T> = new (...args: any[]) => T;
-export type GetInstance<T extends Constructor<any>> = T extends Constructor<infer R> ? R : never;
-export type PageProps<T> = { params: T , searchParams?:  Record<string, any>,}
+export type Constructor<T> = new (...args: unknown[]) => T;
+export type GetInstance<T extends Constructor<unknown>> = T extends Constructor<infer R> ? R : never;
+export type PageProps<T> = { params: T , searchParams?:  Record<string, unknown>,}
 
 export type IParams = {
     name: string;
@@ -11,9 +11,9 @@ export type IParams = {
     in: string;
     type: string;
     required:boolean;
-    paramSchema: any;
-    transform: (value: any) => any;
-    cb?:(req:NextRequest)=>any;
+    paramSchema: unknown;
+    transform: (value: unknown) => unknown;
+    cb?:(req:NextRequest)=>unknown;
 }
 export type IHandler =  {
     method: string;
@@ -28,7 +28,7 @@ export type IPathMeta = {
     summary: string;
     isAuth?: boolean;
     parameters: IParameter[];
-    requestBody: any;
+    requestBody: unknown;
 }
 export type IControllerDetail = {
     tag: {
@@ -44,7 +44,7 @@ export type IControllerMeta = {
 
 
 export type IMiddleware = {
-    (req: NextRequest & Record<string, any>): void;
+    (req: NextRequest & Record<string, unknown>): void;
 }
 
 export type ArrayKeyOf<T> = Array<keyof T>;
@@ -73,7 +73,7 @@ export type MapLevel1s = {
     level2s: MapLevel2s[];
 };
 
-export type ResultType<T extends (...args: any) => any > = ReturnType<T> extends Promise<infer R> ? Promise<R> : Promise<ReturnType<T>>;
+export type ResultType<T extends (...args: unknown[]) => unknown > = ReturnType<T> extends Promise<infer R> ? Promise<R> : Promise<ReturnType<T>>;
 export type LocationType = {
     lat: number;
     lng: number;
@@ -82,11 +82,11 @@ export type LocationType = {
 export type IOptionProperty = {
     description?: string;
     required?: boolean;
-    type?: any;
+    type?: unknown;
     isArray?: boolean;
-    enum?: any[];
-    default?: any;
-    example?: any;
+    enum?: unknown[];
+    default?: unknown;
+    example?: unknown;
 }
 
 export type IOption = {

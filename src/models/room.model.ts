@@ -7,6 +7,7 @@ export interface IRoom extends Document {
   capacity?: number; // Sức chứa tối đa'
   status: string;
   location: mongoose.Types.ObjectId;
+  QrCode?: string;
 }
 
 const RoomSchema = new Schema<IRoom>(
@@ -16,6 +17,7 @@ const RoomSchema = new Schema<IRoom>(
     capacity: { type: Number } ,
     status: { type: String, default: RoomStatus.EMPTY, required: true},
     location: { type: Schema.Types.ObjectId, ref: "Location", required: true },
+    QrCode: { type: String },
   },
   { timestamps: true }
 );

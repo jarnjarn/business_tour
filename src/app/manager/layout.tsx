@@ -14,6 +14,7 @@ import {
     BarChartOutlined,
 } from "@ant-design/icons";
 import { ManagerLayout } from "@/components/layouts/manager.layoout";
+import { MdOutlineRoomPreferences } from "react-icons/md";
 
 const menuItems = [
     { key: "/manager", icon: <UserOutlined />, label: "Quản lý nhân sự" },
@@ -21,6 +22,7 @@ const menuItems = [
     { key: "/manager/tourist", icon: <CalendarOutlined />, label: "Quản lý lịch trình" },
     { key: "/manager/evaluate", icon: <FaComment />, label: "Quản lý đánh giá" },
     { key: "/manager/statistics", icon: <BarChartOutlined />, label: "Thống kê" },
+    { key: "/manager/room", icon: <MdOutlineRoomPreferences  />, label: "Quản lý phòng" },
 ];
 
 export default function ManagerDefaultLayout({ children }: { children: React.ReactNode }) {
@@ -82,8 +84,8 @@ export default function ManagerDefaultLayout({ children }: { children: React.Rea
                             mode="vertical"
                             selectedKeys={[pathname]}
                             className="w-full h-full"
-                            items={menuItems.map((item) => ({
-                                key: item.key,
+                            items={menuItems.map((item, index) => ({
+                                key: index,
                                 icon: item.icon,
                                 label: (
                                     <span

@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { createNotification, getNotifications, markNotificationAsRead, markAllNotificationsAsRead, createNotificationByStaff } from "@/service/noti.service";
 import { verifyToken } from "@/common/middleware/verifyToken";
-
-const noti = new Hono();
+import { EnvWithUser } from "@/@types/hono";
+const noti = new Hono<EnvWithUser>();
 
 // 🟢 Tạo thông báo mới
 noti.post("/", verifyToken, async (c) => {
@@ -13,8 +13,8 @@ noti.post("/", verifyToken, async (c) => {
 
         const newNoti = await createNotification(userId, title, content);
         return c.json(newNoti);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -26,8 +26,8 @@ noti.post("/staff", verifyToken, async (c) => {
 
         const newNoti = await createNotificationByStaff(userId,receiverId, title, content);
         return c.json(newNoti);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -47,8 +47,8 @@ noti.put("/readall", verifyToken, async (c) => {
         const userId = c.get("user").id;
         await markAllNotificationsAsRead(userId as string);
         return c.json({ message: "Tất cả thông báo đã được đánh dấu là đã đọc" });
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 noti.put("read/:id", verifyToken, async (c) => {
@@ -56,8 +56,8 @@ noti.put("read/:id", verifyToken, async (c) => {
         const notificationId = c.req.param("id");
         const updatedNoti = await markNotificationAsRead(notificationId);
         return c.json(updatedNoti);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 

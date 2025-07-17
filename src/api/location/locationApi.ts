@@ -1,12 +1,12 @@
 import { Hono } from "hono";
-import { createLocation, getAllLocations, getLocationById, updateLocation, deleteLocation } from "@/service/location.service";
+import { createLocation, getAllLocations, getLocationById, updateLocation, deleteLocation, updateLocationImg } from "@/service/location.service";
 import { checkAdminOrStaff, verifyToken } from "@/common/middleware/verifyToken";
 
 const location = new Hono();
 
 
 // Tạo mới địa điểm
-location.post("/", verifyToken,checkAdminOrStaff, async (c) => {
+location.post("/", verifyToken, checkAdminOrStaff, async (c) => {
   try {
     const body = await c.req.parseBody(); // Lấy dữ liệu từ FormData
 
@@ -27,8 +27,8 @@ location.post("/", verifyToken,checkAdminOrStaff, async (c) => {
     // Gửi ảnh đã encode lên Cloudinary
     const result = await createLocation(name, cloudinaryUrl, description, address);
     return c.json(result);
-  } catch (error: any) {
-    return c.json({ error: error.message }, 400);
+  } catch (error: unknown) {
+    return c.json({ error: error as Error }, 400);
   }
 });
 
@@ -36,9 +36,9 @@ location.post("/", verifyToken,checkAdminOrStaff, async (c) => {
 
 location.get("/", async (c) => {
   const data = {
-      page: Number(c.req.query("page") || 1),
-      limit: Number(c.req.query("limit") || 10),
-      search: c.req.query("search") || "", // Lấy từ query nếu có
+    page: Number(c.req.query("page") || 1),
+    limit: Number(c.req.query("limit") || 10),
+    search: c.req.query("search") || "", // Lấy từ query nếu có
   };
 
   const locations = await getAllLocations(data);
@@ -51,32 +51,54 @@ location.get("/:id", async (c) => {
     const locationId = c.req.param("id");
     const location = await getLocationById(locationId);
     return c.json(location);
-  } catch (error: any) {
-    return c.json({ error: error.message }, 400);
+  } catch (error: unknown) {
+    return c.json({ error: error as Error }, 400);
   }
 });
 
 // Cập nhật địa điểm
-location.put("/:id", verifyToken,checkAdminOrStaff, async (c) => {
+location.put("/:id", verifyToken, checkAdminOrStaff, async (c) => {
   try {
     const locationId = c.req.param("id");
     const data = await c.req.json();
     const updatedLocation = await updateLocation(locationId, data);
     return c.json(updatedLocation);
-  } catch (error: any) {
-    return c.json({ error: error.message }, 400);
+  } catch (error: unknown) {
+    return c.json({ error: error as Error }, 400);
   }
 });
 
 // Xóa địa điểm
-location.delete("/:id", verifyToken,checkAdminOrStaff, async (c) => {
+location.delete("/:id", verifyToken, checkAdminOrStaff, async (c) => {
   try {
     const locationId = c.req.param("id");
     const result = await deleteLocation(locationId);
     return c.json(result);
-  } catch (error: any) {
-    return c.json({ error: error.message }, 400);
+  } catch (error: unknown) {
+    return c.json({ error: error as Error }, 400);
   }
 });
+
+// Cập nhật ảnh địa điểm
+location.put("/:id/image", verifyToken, checkAdminOrStaff, async (c) => {
+  try {
+    const locationId = c.req.param("id");
+
+    const formData = await c.req.formData(); // ✅ Lấy FormData đúng cách
+    const image = formData.get("image") as File;
+
+    if (!image) throw new Error("Không có ảnh được gửi lên");
+
+    const buffer = await image.arrayBuffer();
+    const base64Image = Buffer.from(buffer).toString("base64");
+    const cloudinaryUrl = `data:${image.type};base64,${base64Image}`;
+
+    const updatedLocation = await updateLocationImg(locationId, cloudinaryUrl);
+    return c.json(updatedLocation);
+  } catch (error: unknown) {
+    return c.json({ error: error as Error }, 400);
+  }
+});
+
 
 export default location;

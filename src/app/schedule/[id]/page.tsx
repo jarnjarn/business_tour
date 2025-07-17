@@ -2,12 +2,12 @@ import { PageProps } from "@/@types/common.type";
 import { UserLayout } from "@/components/layouts/user.layout";
 import { Content } from "./content";
 
-export default function (props:PageProps<{id:number}>)
+export default function ()
 {
     return( 
         <div>
             <UserLayout>
-                <Content id={props.params.id}></Content>
+                <Content />
             </UserLayout>
         </div>
     )

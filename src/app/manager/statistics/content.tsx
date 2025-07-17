@@ -31,8 +31,8 @@ export default function StatisticsContentPage() {
                         </tr>
                     </thead>
                     <tbody className="text-sm">
-                        {statistics?.map((item) => (
-                            <tr key={item.locationId}>
+                        {statistics?.map((item, index) => (
+                            <tr key={index}>
                                 <td className="border p-2">{item.locationName}</td>
                                 <td className="border p-2 text-center">{item.totalTourists}</td>
                                 <td className="border p-2 text-center">{item.totalPeople}</td>

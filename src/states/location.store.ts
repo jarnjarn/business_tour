@@ -28,6 +28,7 @@ export interface LocationState {
     updateLocation: (id: string, data: Partial<Location>) => Promise<void>;
     deleteLocation: (id: string) => Promise<void>;
     getById: (id: string) => Promise<void>;
+    updateLocationImg: (id: string, data: any) => Promise<void>;
 }
 
 export const useLocationStore = create<LocationState>((set, get) => ({
@@ -109,6 +110,18 @@ export const useLocationStore = create<LocationState>((set, get) => ({
         } catch (error) {
             set({ isLoading: false });
         }
+    },
+
+    updateLocationImg: async (id: string, data: any) => {
+        set({ isLoading: true });
+        try {
+            await locationClient.updateLocationImg(id, data);
+            await get().fetchLocations({ page: get().currentPage, limit: 10 });
+            set({ isLoading: false });
+        } catch (error) {
+            set({ isLoading: false });
+        }
     }
+
 
 }));

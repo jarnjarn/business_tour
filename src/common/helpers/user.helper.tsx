@@ -2,10 +2,9 @@ import React, { ReactNode } from "react";
 import {  UserRole } from "@/@types/users/user.enum";
 import { Avatar, Tag } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
-import Image from "next/image";
 
 export class UserHelper {
-    private static roles: Array<{ label: ReactNode | string, value: number }> = [
+    private static roles: Array<{ label: ReactNode | string, value: string }> = [
         { label: <Tag color="red">Quản trị viên</Tag>, value: UserRole.ADMIN },
         { label: <Tag color="blue">Người dùng</Tag>, value: UserRole.USER },
         { label: <Tag color="green">Nhân viên</Tag>, value: UserRole.STAFF },
@@ -15,7 +14,7 @@ export class UserHelper {
         const rolesList = [...this.roles];
 
         if (isAll) {
-            rolesList.unshift({ label: "Tất cả", value: -1 });
+            rolesList.unshift({ label: "Tất cả", value: "-1" });
         }
 
         return rolesList;

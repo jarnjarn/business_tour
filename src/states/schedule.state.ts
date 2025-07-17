@@ -2,17 +2,19 @@ import { create } from "zustand";
 import { CreateScheduleDto, ScheduleClient, UpdateScheduleDto } from "@/clients/schedule.client";
 import { PaginationDto } from "@/dto/pagination.dto";
 import { Pagination } from "@/common/struct/pagination.struct";
+import { User } from "@/@types/users/user.type";
+import { Room } from "./room.state";
 
 const scheduleClient = new ScheduleClient();
 
 export interface Schedule {
     _id: string;
     tourist: string;
-    room: string;
+    room: Room;
     time: string;
     title: string;
     content: string;
-    organizer: string;
+    organizer: User;
     createdAt: string;
     updatedAt: string;
 }
@@ -70,7 +72,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
         set({ select: schedule });
     },
 
-    createSchedule: async (data: CreateScheduleDto) => {
+    createSchedule: async (data: CreateScheduleDto) => {    
         set({ isLoading: true });
         try {
             await scheduleClient.createSchedule(data);
@@ -129,5 +131,6 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
         } catch (error) {
             set({ isLoading: false });
         }
-    }
+    },
+    
 }));

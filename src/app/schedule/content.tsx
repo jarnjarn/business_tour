@@ -23,9 +23,9 @@ export function ScheduleContent() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 p-4">
-                {tourists?.data?.map((tourist) => (
+                {tourists?.data?.map((tourist, index) => (
                     <div
-                        key={tourist._id}
+                        key={index}
                         className="relative overflow-hidden rounded-xl shadow-lg group cursor-pointer"
                         onMouseEnter={() => setHoveredId(tourist._id)}
                         onMouseLeave={() => setHoveredId(null)}

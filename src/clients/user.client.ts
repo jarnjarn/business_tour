@@ -13,7 +13,7 @@ export interface UpdatePassWordDto {
 
 export class UserClient {
     login(data: UserLoginDto) {
-        return axiosClient.post("/user/login", data);
+        return axiosClient.post<{token:string}>("/user/login", data);
     }
 
     register(data: UserRegisterDto) {

@@ -24,7 +24,8 @@ export const createSchedule = async (
         time,
         title,
         content,
-        organizer
+        organizer,
+        userResgister: []
     });
 
     await newSchedule.save();
@@ -102,3 +103,5 @@ export const deleteSchedule = async (scheduleId: string) => {
 
     return { message: "Schedule deleted successfully" };
 };
+
+

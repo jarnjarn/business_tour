@@ -1,4 +1,6 @@
+import { UserRegisterTourist } from "@/@types/userRegisytourt";
 import mongoose, { Schema, Document, Model } from "mongoose";
+
 
 export interface ISchedule extends Document {
   tourist: mongoose.Types.ObjectId;
@@ -16,7 +18,7 @@ const ScheduleSchema = new Schema<ISchedule>(
     time: { type: Date, required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
-    organizer: { type: Schema.Types.ObjectId, ref: "User", required: true }
+    organizer: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );

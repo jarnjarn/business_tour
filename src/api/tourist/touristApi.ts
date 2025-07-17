@@ -5,11 +5,14 @@ import {
     getTouristById, 
     updateTouristStatus, 
     deleteTouristRequest, 
-    compareTouristStatsByLocation
+    compareTouristStatsByLocation,
+    updateUserRegister
 } from "@/service/tourist.service";
 import { checkAdminOrStaff, verifyToken } from "@/common/middleware/verifyToken";
+import { EnvWithUser } from "@/@types/hono";
 
-const tourist = new Hono();
+const tourist = new Hono<EnvWithUser>();
+
 
 // 🟢 Tạo yêu cầu du lịch mới
 tourist.post("/", verifyToken, async (c) => {
@@ -80,6 +83,18 @@ tourist.delete("/:id", verifyToken,checkAdminOrStaff, async (c) => {
     }
 });
 
+
+// 🟢 Đăng ký lịch trình
+tourist.post("/register/:id", verifyToken, async (c) => {
+    try {
+        const touristId = c.req.param("id");
+        const user = await c.req.json();
+        const result = await updateUserRegister(touristId, user);
+        return c.json(result);
+    } catch (error: any) {
+        return c.json({ error: error.message }, 400);
+    }
+});
 
 
 export default tourist;

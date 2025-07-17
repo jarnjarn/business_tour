@@ -1,17 +1,19 @@
-'use client';
-
-import { useEffect, useState } from "react";
-import { CreateLocationModal } from "@/components/modal/location/create.modal";
-import { UpdateLocationModal } from "@/components/modal/location/update.model";
-import { Input, Button, Popconfirm, Space, Table, Tooltip, Upload } from "antd";
-import Image from "next/image";
-import { useLocationStore } from "@/states/location.store";
-import { RequireRole } from "@/components/requireRole/RequireRole";
+'use client'
 import { UserRole } from "@/@types/users/user.enum";
-import { AiOutlineSchedule, AiOutlinePicture } from "react-icons/ai";
-import ListRoom from "@/components/modal/room/listRoom.location";
-export function ManagerTourContentPage() {
-    const { locations, fetchLocations, deleteLocation, isLoading, } = useLocationStore();
+import { CreateRoomModal } from "@/components/modal/room/create.room";
+import ShowQr from "@/components/modal/room/showQr";
+import { UpdateRoomModal } from "@/components/modal/room/update.room";
+import { RequireRole } from "@/components/requireRole/RequireRole";
+import { PaginationDto } from "@/dto/pagination.dto";
+import { useRoomStore } from "@/states/room.state";
+import { Button, Input, Popconfirm, Space, Table, Tooltip, Upload } from "antd";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { AiOutlinePicture, AiOutlineEdit, AiOutlineQrcode } from "react-icons/ai";
+
+export default function RoomContent() {
+    const { fetchRooms, rooms, isLoading, deleteRoom, updateRoomImg, setSelect } = useRoomStore()
+
     const [search, setSearch] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -19,21 +21,19 @@ export function ManagerTourContentPage() {
     const [config, setConfig] = useState<Record<string, boolean>>({
         create: false,
         update: false,
-        list: false
+        show: false
     });
     const [query, setQuery] = useState<Record<string, any>>({
         page: 1,
         limit: 10,
         query: "",
     });
-    const { updateLocationImg } = useLocationStore();
-
     useEffect(() => {
         loadLocations(query.page, query.limit, search);
     }, [query, search]); // Theo dõi query và search
 
     const loadLocations = async (page: number, limit: number, search: string) => {
-        await fetchLocations({ page, limit, search });
+        await fetchRooms({ page, limit, search });
     };
 
     const toggle = (key: string) => () => {
@@ -55,7 +55,7 @@ export function ManagerTourContentPage() {
             handleUpload(file);
             const formData = new FormData();
             formData.append("image", file); // file là object kiểu File từ <Upload>
-            await updateLocationImg(entity._id, formData);
+            await updateRoomImg(entity._id, formData);
             // Cập nhật lại dữ liệu sau khi upload thành công
             await loadLocations(query.page, query.limit, search);
         } catch (err) {
@@ -68,18 +68,18 @@ export function ManagerTourContentPage() {
         <RequireRole roles={[UserRole.ADMIN, UserRole.STAFF]}>
 
             <div className="max-w-[100vw]">
+                <CreateRoomModal open={config.create} onCancel={toggle("create")} />
+                <UpdateRoomModal open={config.update} onCancel={toggle("update")} />
+                <ShowQr open={config.show} onCancel={toggle("show")} />
                 <br />
                 <h1 className="text-lg text-center font-semibold text-lime-700 md:text-2xl">
-                    DANH SÁCH ĐỊA ĐIỂM
+                    DANH SÁCH PHÒNG
                 </h1>
                 <br />
-                <CreateLocationModal open={config.create} onCancel={toggle("create")} />
-                <ListRoom open={config.list} onCancel={toggle("list")} />
-                <UpdateLocationModal open={config.update} onCancel={toggle("update")} />
                 <div className="flex justify-between mb-4 flex-col md:flex-row gap-4">
                     <div className="lg:max-w-[350px] md:min-w-[350px] min-w-[100%] flex gap-2">
                         <Button onClick={toggle("create")} type="primary">
-                            Tạo địa điểm mới
+                            Tạo phòng mới
                         </Button>
                         <Input.Search
                             size="middle"
@@ -94,13 +94,13 @@ export function ManagerTourContentPage() {
                 </div>
                 <Table
                     size="small"
-                    dataSource={locations?.data}
+                    dataSource={rooms?.data}
                     rowKey="_id"
                     scroll={{ x: 720 }}
                     loading={isLoading}
                     pagination={{
                         size: "default",
-                        total: locations?.total, // Tổng số địa điểm
+                        total: rooms?.total, // Tổng số địa điểm
                         pageSize: query.limit,
                         current: query.page,
                         showSizeChanger: true,
@@ -113,23 +113,15 @@ export function ManagerTourContentPage() {
                     }}>
                     <Table.Column width={50} align="center" title="STT" render={(_, __, index) => index + 1} />
                     <Table.Column width={150} title="Tên địa điểm" dataIndex="name" key="name" />
+                    <Table.Column width={150} title="Địa điểm" dataIndex="location" key="location" render={(_, record) => record.location.name} />
+                    <Table.Column width={150} title="Trạng thái" dataIndex="status" key="status" render={(_, record) => record.status ? "Phòng Trống " : "Phòng Đã Được Sử Dụng"} />
                     <Table.Column
                         width={150}
                         title="Hình ảnh"
-                        dataIndex="image"
-                        key="image"
-                        render={(img) => (
-                            <div className="relative w-16 h-16">
-                                <Image src={img} alt="Hình ảnh" layout="fill" objectFit="cover" className="rounded-md" />
-                            </div>
-                        )}
-                    />
-                    <Table.Column
-                        width={250}
-                        title="Mô tả"
-                        key="description"
-                        render={(_, record) => (
-                            <div className="line-clamp-3 break-words">{record.description}</div>
+                        dataIndex="QrCode"
+                        key="QrCode"
+                        render={(record, _) => (
+                            <Image src={record} alt="Hình ảnh" layout="fill" objectFit="cover" className="rounded-md" />
                         )}
                     />
 
@@ -139,16 +131,7 @@ export function ManagerTourContentPage() {
                         title="Chức năng"
                         render={(_, entity) => (
                             <Space>
-                                <Tooltip title="Xem danh sách phòng">
-                                    <Button
-                                        onClick={() => {
-                                            useLocationStore.getState().setSelect(entity as any);
-                                            toggle("list")();
-                                        }}
-                                        type={"primary"}
-                                    ><AiOutlineSchedule /></Button>
-                                </Tooltip>
-                                <Tooltip title="Cập nhật ảnh">
+                                <Tooltip title="Cập nhật ảnh QrCode">
                                     <Upload
                                         accept="image/*"
                                         showUploadList={false}
@@ -163,21 +146,32 @@ export function ManagerTourContentPage() {
                                     </Upload>
 
                                 </Tooltip>
+
+                                <Tooltip title="Xem QR Code">
+                                    <Button type="primary" onClick={() => {
+                                        setSelect(entity as any);
+                                        toggle("show")();
+                                    }}>
+                                        <AiOutlineQrcode />
+                                    </Button>
+                                </Tooltip>
+
+
                                 <Button
                                     onClick={() => {
-                                        useLocationStore.getState().setSelect(entity as any);
+                                        useRoomStore.getState().setSelect(entity as any);
                                         toggle("update")();
                                     }}
                                     type="primary"
                                 >
-                                    Cập nhật
+                                    <AiOutlineEdit />
                                 </Button>
 
                                 <Popconfirm
-                                    title="Bạn có chắc chắn xóa địa điểm này?"
+                                    title="Bạn có chắc chắn xóa phòng này?"
                                     okText="Có"
                                     cancelText="Không"
-                                    onConfirm={() => deleteLocation(entity._id)}
+                                    onConfirm={() => deleteRoom(entity._id)}
                                 >
                                     <Button type="primary" danger>Xóa</Button>
                                 </Popconfirm>

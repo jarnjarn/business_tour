@@ -1,3 +1,4 @@
+
 import axiosClient from "./axios";
 import { PaginationDto } from "@/dto/pagination.dto";
 
@@ -53,4 +54,5 @@ export class ScheduleClient {
     deleteSchedule = async (id: string) => {
         return axiosClient.delete(`/schedule/${id}`);
     };
+
 }

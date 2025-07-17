@@ -43,4 +43,13 @@ export class LocationClient {
     deleteLocation(id: string) {
         return axiosClient.delete(`/location/${id}`);
     }
+
+    updateLocationImg(id: string, data: FormData) {
+        return axiosClient.put(`/location/${id}/image`, data,
+            {
+                headers: {
+                    "Content-Type": "application/form-data",
+                },
+            });
+    }
 }

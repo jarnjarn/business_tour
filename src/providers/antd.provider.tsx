@@ -8,7 +8,7 @@ import vi_VN from "antd/lib/locale/vi_VN";
 export const AntdProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <ConfigProvider locale={vi_VN} componentSize="middle" theme={{
-            algorithm: theme.darkAlgorithm
+            algorithm: theme.defaultAlgorithm
         }}>
             <AntdRegistry>{children}</AntdRegistry>
         </ConfigProvider>

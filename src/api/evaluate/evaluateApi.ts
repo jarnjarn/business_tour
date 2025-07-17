@@ -2,14 +2,15 @@ import { Hono } from "hono";
 import { checkAdminOrStaff, verifyToken } from "@/common/middleware/verifyToken";
 import { createEvaluate, deleteEvaluate, getAllEvaluates, getEvaluateById, getEvaluateByIdLocation, updateEvaluate } from "@/service/evaluate.service";
 import { EvaluateCreateDto } from "@/dto/evaluate.dto";
+import { EnvWithUser } from "@/@types/hono";
 
-const evaluate = new Hono();
-
+const evaluate = new Hono<EnvWithUser>();
 // 🟢 Thêm lịch trình mới
 evaluate.post("/", verifyToken, async (c) => {
     try {
         const { location ,star, content } = await c.req.json();
-        const user = c.get("user").id;
+        const user = (c.get("user") as { id: string }).id;
+
         if (!location || !star || !content) {
             return c.json({ error: "Thiếu thông tin bắt buộc" }, 400);
         }
@@ -19,8 +20,8 @@ evaluate.post("/", verifyToken, async (c) => {
 
         const newEvaluate = await createEvaluate(data);
         return c.json(newEvaluate);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+            return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -40,8 +41,8 @@ evaluate.get("/:id", async (c) => {
         const EvaluateId = c.req.param("id");
         const Evaluate = await getEvaluateById(EvaluateId);
         return c.json(Evaluate);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -50,8 +51,8 @@ evaluate.get("/location/:locationID", async (c) => {
         const locationID = c.req.param("locationID");
         const Evaluates = await getEvaluateByIdLocation(locationID);
         return c.json(Evaluates);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -62,8 +63,8 @@ evaluate.put("/:id", verifyToken, async (c) => {
 
         const updatedEvaluate = await updateEvaluate(EvaluateId, updates);
         return c.json(updatedEvaluate);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -72,8 +73,8 @@ evaluate.delete("/:id", verifyToken, checkAdminOrStaff, async (c) => {
         const EvaluateId = c.req.param("id");
         const result = await deleteEvaluate(EvaluateId);
         return c.json(result);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 

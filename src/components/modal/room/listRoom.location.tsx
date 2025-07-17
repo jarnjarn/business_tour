@@ -1,10 +1,6 @@
 'use client'
 import { Button, Input, Modal, ModalProps, Popconfirm, Select, Space, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
-import { UpdateTouristModal } from "../tourist/update.tourist";
-import { useTouristStore } from "@/states/tourist.state";
-import { useScheduleStore } from "@/states/schedule.state";
-import dayjs from "dayjs";
 import { Room, useRoomStore } from "@/states/room.state";
 import { useLocationStore } from "@/states/location.store";
 import { CreateRoomModal } from "./create.room";
@@ -44,12 +40,12 @@ export default function ListRoom(props: ModalProps) {
         <div className={"max-w-[1000px]"}>
             <Modal
                 {...props}
-                title="Danh sách phòng"
+                title="Danh sách phòng" 
                 cancelText="Đóng"
                 width={1240}
             >
                 <div>
-                    <CreateRoomModal LocationId={select?._id as any} open={config.create} onCancel={toggle("create")} />
+                    <CreateRoomModal open={config.create} onCancel={toggle("create")} />
                     <UpdateRoomModal open={config.update} onCancel={toggle("update")} />
                     <div className="flex justify-between mb-4 flex-col md:flex-row gap-4">
                         <div className="lg:max-w-[350px] md:min-w-[350px] min-w-[100%] flex gap-2">

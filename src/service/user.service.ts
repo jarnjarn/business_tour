@@ -58,7 +58,7 @@ export const loginUser = async (username: string, password: string) => {
     { expiresIn: "3h" }
   );
 
-  return { token, user };
+  return { data: { token, user } };
 };
 
 export const getUserById = async (userId: string) => {

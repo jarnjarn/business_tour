@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { PaginationDto } from "@/dto/pagination.dto";
 import { Pagination } from "@/common/struct/pagination.struct";
 import { CreateRoomDto, RoomClient, UpdateRoomDto } from "@/clients/room.client";
+import { RoomStatus } from "@/@types/room/room.enum";
 
 const roomClient = new RoomClient();
 
@@ -10,8 +11,9 @@ export interface Room    {
     name: string;
     description: string;
     capacity: number;
-    status: boolean;
+    status: RoomStatus;
     location: string;
+    QrCode: string;
     organizer: string;
     createdAt: string;
     updatedAt: string;
@@ -34,6 +36,7 @@ export interface RoomState {
     deleteRoom: (id: string) => Promise<void>;
     getById: (id: string) => Promise<void>;
     getByLocationId: (id: string) => Promise<void>;
+    updateRoomImg: (id: string, data: FormData) => Promise<void>;
 }
 
 export const useRoomStore = create<RoomState>((set, get) => ({
@@ -138,6 +141,16 @@ export const useRoomStore = create<RoomState>((set, get) => ({
         try {
             await roomClient.deleteRoom(id);
             await get().fetchRooms({ page: get().currentPage, limit: 10 });
+        } catch (error) {
+            set({ isLoading: false });
+        }
+    },
+    updateRoomImg: async (id: string, data: FormData) => {
+        set({ isLoading: true });
+        try {
+            await roomClient.updateRoomImg(id, data);
+            await get().getById(id);
+            set({ isLoading: false });
         } catch (error) {
             set({ isLoading: false });
         }

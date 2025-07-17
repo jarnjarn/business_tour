@@ -24,15 +24,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     isLoading: false,
     auth: null,
     loading: async (cb, err) => {
-        set({ isLoading: true })
+        set({ isLoading: true });
         try {
-            await cb()
+            return await cb(); // ✅ return kết quả để hàm ngoài nhận được
         } catch (e) {
             if (err) {
-                err(e as Error)
+                err(e as Error);
             }
+            throw e; // ✅ throw lại lỗi để `login()` biết lỗi và ném ra component
+        } finally {
+            set({ isLoading: false });
         }
-        set({ isLoading: false })
     },
     register: async (data) => {
         get().loading(async () => {
@@ -50,24 +52,30 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         })
     },
     login: async (data) => {
-        get().loading(async () => {
+        await get().loading(async () => {
             try {
                 const res = await userClient.login(data);
-                CookieUtil.setCookie("token", res?.token);
-                await get().fetchMe(); 
+                // Kiểm tra nếu không có token thì ném lỗi
+                if (!res?.data?.token) {
+                    throw new Error("Token không tồn tại");
+                }
+
+                CookieUtil.setCookie("token", res.data.token);
+                await get().fetchMe();
                 setTimeout(() => {
                     window.location.replace("/");
                 }, 1000);
             } catch (error) {
-                console.log(error);
+                throw error; // <--- BẮT BUỘC phải throw lại để component nhận biết là lỗi
             }
         });
     },
+
     fetchMe: async () => {
         get().loading(async () => {
             try {
                 const res = await userClient.getMe();
-                set({ auth: res as any}); // Cập nhật trạng thái auth
+                set({ auth: res as any }); // Cập nhật trạng thái auth
             } catch (error) {
                 console.log("Lỗi khi lấy thông tin người dùng:", error);
                 CookieUtil.removeCookie("token")

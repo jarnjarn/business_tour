@@ -1,19 +1,22 @@
 'use client'
-import { DatePicker, Modal } from "antd";
+import { DatePicker, Modal, Select } from "antd";
 import type { ModalProps } from "antd"; // ✅ Đúng cách import kiểu dữ liệu
 import { Form, Input, message } from "antd";
 import { useEffect } from "react";
 import dayjs from "dayjs";
 import { useScheduleStore } from "@/states/schedule.state";
+import { UserRole } from "@/@types/users/user.enum";
+import { useUserStore } from "@/states/user.state";
+import { useRoomStore } from "@/states/room.state";
 
 export function UpdateScheduleModal(props: ModalProps) {
     const { select, updateSchedule } = useScheduleStore();
     const [form] = Form.useForm();
     const [messageApi, contextHolder] = message.useMessage();
-
+    const { users } = useUserStore();
+    const { list } = useRoomStore();
 
     const onFinish = async (values: any) => {
-        console.log(select)
         if (!select) {
             messageApi.error("Không có lựa chọn được chọn!");
             return;
@@ -34,11 +37,15 @@ export function UpdateScheduleModal(props: ModalProps) {
         if (props.open && select) {
             form.setFieldsValue({
                 ...select,
-                time: select.time ? dayjs(select.time) : undefined, // Chuyển đổi thành dayjs nếu có giá trị
+                time: select.time ? dayjs(select.time) : undefined,
+                organizer: select.organizer?._id,
+                room: select.room?._id,
             });
+
         } else {
             form.resetFields();
         }
+        console.log(select)
     }, [props.open, select]);
 
 
@@ -81,9 +88,11 @@ export function UpdateScheduleModal(props: ModalProps) {
                     <Form.Item
                         label="Người hưỡng dẫn"
                         name="organizer"
-                        rules={[{ required: true, message: "Vui lòng nhập Tiêu Đề" }]}
+                        rules={[{ required: true, message: "Vui lòng chọn Người hưỡng dẫn" }]}
                     >
-                        <Input />
+                        <Select
+                            options={users?.data?.filter((item: any) => item.role === UserRole.STAFF).map((item: any) => ({ label: item.username, value: item.username })) || []}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Nội dung"
@@ -91,6 +100,23 @@ export function UpdateScheduleModal(props: ModalProps) {
                         rules={[{ required: true, message: "Vui lòng nhập Nội dung" }]}
                     >
                         <Input.TextArea />
+                    </Form.Item>
+                    <Form.Item
+                        label="Phòng"
+                        name="room"
+                    >
+                        <Select
+                            options={
+                                list?.map((item: any) => ({
+                                    label: item.name,
+                                    value: item._id
+                                })) || []
+                            }
+                            value={form.getFieldValue("room")}
+                            onChange={(value) => {
+                                form.setFieldsValue({ room: value });
+                            }}
+                        />
                     </Form.Item>
                 </Form>
             </Modal>

@@ -1,7 +1,7 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 export class DateUtil {
     static format(date: Date, format: string): string {
-        return moment(date).format(format);
+        return dayjs(date).format(format);
     }
 }

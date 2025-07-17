@@ -1,5 +1,13 @@
 import { TouristStatus } from "@/@types/tourist/tourist.enum";
+import { UserRegisterTourist } from "@/@types/userRegisytourt";
 import mongoose, { Schema, Document, Model } from "mongoose";
+
+export interface IUserRegister {
+  name: string;
+  phone: string;
+  group: string;
+  type: UserRegisterTourist;
+}
 
 export interface ITourist extends Document {
   location: mongoose.Types.ObjectId;
@@ -10,7 +18,19 @@ export interface ITourist extends Document {
   to: Date;
   status: TouristStatus;
   note?: string; // Ghi chú của nhân viên
+  userRegister: IUserRegister[];
 }
+
+const userRegisterSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    phone: { type: String, required: true },
+    group: { type: String, required: true },
+    type: { type: String, required: true },
+  },
+  { _id: false } // không cần _id riêng cho mỗi item trong mảng
+);
+
 
 const TouristSchema = new Schema<ITourist>(
   {
@@ -25,7 +45,8 @@ const TouristSchema = new Schema<ITourist>(
       enum: Object.values(TouristStatus),
       default: TouristStatus.PENDING
     },
-    note: { type: String } // Lưu ghi chú nếu cần
+    note: { type: String }, // Lưu ghi chú nếu cần
+    userRegister: { type: [userRegisterSchema], required: true }
   },
   { timestamps: true }
 );

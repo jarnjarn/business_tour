@@ -5,9 +5,7 @@ export interface CreateRoomDto {
     name: string;  // ID của Tourist
     description: string;  // Id phòng
     capacity: number;      // Thời gian diễn ra sự kiện
-    status: string;     // Tiêu đề
     location: string;   // Nội dung chi tiết
-    organizer: string; // Người tổ chức
 }
 
 export interface UpdateRoomDto {
@@ -16,7 +14,6 @@ export interface UpdateRoomDto {
     capacity?: number;
     status?: string;
     location?: string;
-    organizer?: string;
 }
 
 export class RoomClient {
@@ -54,4 +51,12 @@ export class RoomClient {
     deleteRoom = async (id: string) => {
         return axiosClient.delete(`/room/${id}`);
     };
+    updateRoomImg(id: string, data: FormData) {
+        return axiosClient.put(`/room/${id}/image`, data,
+            {
+                headers: {
+                    "Content-Type": "application/form-data",
+                },
+            });
+    }
 }

@@ -7,12 +7,11 @@ import { CreateEvaluateModal } from "@/components/modal/evaluate/create.evaluate
 import { useEvaluateStore } from "@/states/evaluate.state";
 import { Avatar } from "antd";
 import { FaStar } from "react-icons/fa"; // Biểu tượng sao
+import { useParams } from "next/navigation";
 
-interface ContentProps {
-    id: string;
-}
 
-export function Content({ id }: ContentProps) {
+export function Content() {
+    const { id } = useParams();
     const { location, isLoading, getById } = useLocationStore();
     const [config, setConfig] = useState<Record<string, boolean>>({
         create: false,
@@ -23,8 +22,8 @@ export function Content({ id }: ContentProps) {
     const { list, getByIdTourist } = useEvaluateStore();
 
     useEffect(() => {
-        getById(id);
-        getByIdTourist(id);
+        getById(id as string);
+        getByIdTourist(id as string);
     }, [id, getById]);
 
     const toggle = (key: string) => () => {
@@ -43,8 +42,8 @@ export function Content({ id }: ContentProps) {
 
     return (
         <div>
-            <CreateTouristModal locationId={id} open={config.create} onCancel={toggle('create')} />
-            <CreateEvaluateModal locationId={id} open={config.createValuate} onCancel={toggle('createValuate')} />
+            <CreateTouristModal locationId={id as string} open={config.create} onCancel={toggle('create')} />
+            <CreateEvaluateModal locationId={id as string} open={config.createValuate} onCancel={toggle('createValuate')} />
             <div className="m-3">
                 {isLoading ? (
                     <p>Đang tải dữ liệu...</p>

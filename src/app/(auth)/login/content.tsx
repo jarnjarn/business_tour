@@ -23,19 +23,14 @@ export default function LoginPage() {
     }, []);
 
     const onFinish = async (values: UserLoginDto) => {
-        // Gọi API đăng ký
-        const userData: UserLoginDto = {
-            username: values.username,
-            password: values.password,
-        };
         try {
-            await login(userData);
+            await login(values);
             messageApi.success("Đăng nhập thành công!");
-
-        } catch (error) {
-            messageApi.error("Đăng nhập thất bại");
+        } catch (error: any) {
+            messageApi.error("Sai tài khoản hoặc mật khẩu");
         }
     };
+
     return (
         <>
             {contextHolder}
@@ -91,9 +86,11 @@ export default function LoginPage() {
                         <span>Bạn chưa có tài khoản? Đăng ký <Link href={`/register`}>tại đây!</Link></span>
                     </div>
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" block>
+                        {isLoading ? <Button type="primary" htmlType="submit" block>
+                            Đang đăng nhập...
+                        </Button> : <Button type="primary" htmlType="submit" block>
                             Đăng nhập
-                        </Button>
+                        </Button>}
                     </Form.Item>
                 </Form>
             </div>

@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/states/auth.state";
 import { useUserStore } from "@/states/user.state";
 import { UserRole } from "@/@types/users/user.enum";
+import { RoomStatus } from "@/@types/room/room.enum";
 
 interface CreateScheduleModalProps extends ModalProps {
     TouristId: string; // ID của địa điểm
@@ -110,7 +111,7 @@ export function CreateScheduleModal({ TouristId, ...props }: CreateScheduleModal
                         <Select
                             options={
                                 list
-                                    ?.filter((item: any) => item.status === true)
+                                    ?.filter((item: any) => item.status === RoomStatus.EMPTY)
                                     .map((item: any) => ({
                                         label: item.name,
                                         value: item._id,

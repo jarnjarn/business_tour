@@ -5,10 +5,9 @@ import {
     getScheduleById, 
     getSchedulesByTouristId,  // 🟢 Thêm hàm mới để lấy danh sách theo touristId
     updateSchedule, 
-    deleteSchedule 
+    deleteSchedule, 
 } from "@/service/schedule.service";
 import { checkAdminOrStaff, verifyToken } from "@/common/middleware/verifyToken";
-
 const schedule = new Hono();
 
 // 🟢 Thêm lịch trình mới
@@ -22,8 +21,8 @@ schedule.post("/", verifyToken,checkAdminOrStaff, async (c) => {
 
         const newSchedule = await createSchedule(touristId, roomId, time, title, content, organizer);
         return c.json(newSchedule);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -45,8 +44,8 @@ schedule.get("/:id", async (c) => {
         const scheduleId = c.req.param("id");
         const schedule = await getScheduleById(scheduleId);
         return c.json(schedule);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -56,8 +55,8 @@ schedule.get("/tourist/:touristId", async (c) => {
         const touristId = c.req.param("touristId");
         const schedules = await getSchedulesByTouristId(touristId);
         return c.json(schedules);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -69,8 +68,8 @@ schedule.put("/:id", verifyToken,checkAdminOrStaff, async (c) => {
 
         const updatedSchedule = await updateSchedule(scheduleId, updates);
         return c.json(updatedSchedule);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 
@@ -80,8 +79,8 @@ schedule.delete("/:id", verifyToken,checkAdminOrStaff, async (c) => {
         const scheduleId = c.req.param("id");
         const result = await deleteSchedule(scheduleId);
         return c.json(result);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error: unknown) {
+        return c.json({ error: error as Error }, 400);
     }
 });
 

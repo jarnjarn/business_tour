@@ -4,18 +4,16 @@ import { useTouristStore } from "@/states/tourist.state";
 import dayjs from "dayjs";
 import Image from "next/image";
 import { useEffect } from "react";
+import { useParams } from "next/navigation";
 
-interface ScheduleProps {
-    id: string;
-}
-
-export function Content({ id }: ScheduleProps) {
+export function Content() {
+    const { id } = useParams();
     const { list, getByIdTourist } = useScheduleStore();
     const { getById, tourist } = useTouristStore();
 
     useEffect(() => {
-        getByIdTourist(id);
-        getById(id);
+        getByIdTourist(id as string);
+        getById(id as string);
     }, [id]);
     return (
         <div className="p-3 md:p-6 bg-gray-100 rounded-lg shadow-md mt-6">
@@ -58,8 +56,8 @@ export function Content({ id }: ScheduleProps) {
                                     <p className="text-lg font-bold text-gray-700">{dayjs(item.time).format("DD/MM/YYYY:HH")}</p>
                                     <p className="text-lg font-semibold">{item.title}</p>
                                     <p className="text-sm">Nội dung: {item.content}</p>
-                                    <p className="text-xs text-gray-500">Người hưỡng dẫn: {item.organizer?.username || "Không xác định"}</p>
-                                    <p className="text-xs text-gray-500">Phòng: {item.room?.name || "Không xác định"}</p>
+                                    <p className="text-xs text-gray-500">Người hưỡng dẫn: {item.organizer.username}</p>
+                                    <p className="text-xs text-gray-500">Phòng: {item.room.name}</p>
                                 </div>
                             </div>
                         ))}
