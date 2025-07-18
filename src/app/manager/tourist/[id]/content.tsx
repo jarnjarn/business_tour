@@ -60,7 +60,7 @@ export default function TouristDetail() {
             return;
         }
 
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_API_HOST || "https://business-tour.duckdns.org/";
 
         const registerUrl = `${baseUrl}/checkin/${tourist?._id}?from=${encodeURIComponent(fromDate.format('YYYY-MM-DD HH:mm'))}&to=${encodeURIComponent(toDate.format('YYYY-MM-DD HH:mm'))}&type=REGISTER`;
         const unregisterUrl = `${baseUrl}/checkin/${tourist?._id}?from=${encodeURIComponent(fromDate.format('YYYY-MM-DD HH:mm'))}&to=${encodeURIComponent(toDate.format('YYYY-MM-DD HH:mm'))}&type=UNREGISTER`;
