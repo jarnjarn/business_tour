@@ -32,8 +32,8 @@ export default function TouristDetail() {
         const fetchData = async () => {
             getById(id as string);
             getByIdTourist(id as string);
-            const qrRegisterUrl = localStorage.getItem('qrRegisterUrl');
-            const qrUnregisterUrl = localStorage.getItem('qrUnregisterUrl');
+            const qrRegisterUrl = localStorage.getItem(`qrRegisterUrl-${id}`);
+            const qrUnregisterUrl = localStorage.getItem(`qrUnregisterUrl-${id}`);
             if (qrRegisterUrl) {
                 const qr = await QRCode.toDataURL(qrRegisterUrl);
                 setQrRegisterUrl(qr);
@@ -60,7 +60,7 @@ export default function TouristDetail() {
             return;
         }
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_HOST || "https://business-tour.duckdns.org/";
+        const baseUrl = "https://business-tour.duckdns.org/";
 
         const registerUrl = `${baseUrl}/checkin/${tourist?._id}?from=${encodeURIComponent(fromDate.format('YYYY-MM-DD HH:mm'))}&to=${encodeURIComponent(toDate.format('YYYY-MM-DD HH:mm'))}&type=REGISTER`;
         const unregisterUrl = `${baseUrl}/checkin/${tourist?._id}?from=${encodeURIComponent(fromDate.format('YYYY-MM-DD HH:mm'))}&to=${encodeURIComponent(toDate.format('YYYY-MM-DD HH:mm'))}&type=UNREGISTER`;
@@ -72,8 +72,8 @@ export default function TouristDetail() {
             setQrRegisterUrl(registerQR);
             setQrUnregisterUrl(unregisterQR);
 
-            localStorage.setItem('qrRegisterUrl', registerUrl);
-            localStorage.setItem('qrUnregisterUrl', unregisterUrl);
+            localStorage.setItem(`qrRegisterUrl-${tourist?._id}`, registerUrl);
+            localStorage.setItem(`qrUnregisterUrl-${tourist?._id}`, unregisterUrl);
 
             setTimeout(() => {
                 qrRef.current?.scrollIntoView({ behavior: 'smooth' });
