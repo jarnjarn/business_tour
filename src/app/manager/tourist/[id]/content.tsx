@@ -60,7 +60,7 @@ export default function TouristDetail() {
             return;
         }
 
-        const baseUrl = "https://business-tour.duckdns.org/";
+        const baseUrl = typeof window !== 'undefined' ? location.origin : `http://localhost:${process.env.PORT}`;
 
         const registerUrl = `${baseUrl}/checkin/${tourist?._id}?from=${encodeURIComponent(fromDate.format('YYYY-MM-DD HH:mm'))}&to=${encodeURIComponent(toDate.format('YYYY-MM-DD HH:mm'))}&type=REGISTER`;
         const unregisterUrl = `${baseUrl}/checkin/${tourist?._id}?from=${encodeURIComponent(fromDate.format('YYYY-MM-DD HH:mm'))}&to=${encodeURIComponent(toDate.format('YYYY-MM-DD HH:mm'))}&type=UNREGISTER`;
