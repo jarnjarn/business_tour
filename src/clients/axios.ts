@@ -1,10 +1,11 @@
+'use client'
 import axios from "axios";
 import {message} from "antd";
 import {CookieUtil} from "@/common/utils/cookie.util";
 
 
 const axiosClient = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_HOST+"/",
+    baseURL: typeof window !== 'undefined' ? location.origin+`/api` : `http://localhost:${process.env.PORT}/api/`,
     headers: {
         'Content-Type': 'application/json'
     }
